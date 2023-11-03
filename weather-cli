@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo "Please enter a city:"
+read city_input
+
+api_key=$(cat api_key.txt)
+
+# Här är din API-URL. Ersätt detta med din faktiska URL!
+api_url="http://api.openweathermap.org/data/2.5/weather?q=$city_input&appid=$api_key"
+
+# Använd `curl` för att göra en GET-begäran till API:et.
+response=$(curl -s "$api_url")
+
+# Använd `jq` för att plocka ut data från JSON-responsen.
+city=$(echo $response | jq -r '.name')
+forecast=$(echo $response | jq -r '.weather[0].description')
+temp_min_k=$(echo $response | jq -r '.main.temp_min')
+temp_max_k=$(echo $response | jq -r '.main.temp_max')
+
+temp_min_c=$(echo "$temp_min_k - 273.15" | bc)
+temp_max_c=$(echo "$temp_max_k - 273.15" | bc)
+
+# Skriv ut datan till terminalen.
+echo "City: $city"
+echo "Forecast: $forecast"
+echo "Min Temp: $temp_min_c °C"
+echo "Max Temp: $temp_max_c °C"
